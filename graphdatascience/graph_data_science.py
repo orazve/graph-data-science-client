@@ -12,6 +12,7 @@ from .call_builder import IndirectCallBuilder
 from .endpoints import AlphaEndpoints, BetaEndpoints, DirectEndpoints
 from .error.uncallable_namespace import UncallableNamespace
 from .model.fastpath_runner import FastPathRunner
+from .model.kge_runner import KgeRunner
 from .query_runner.arrow_query_runner import ArrowQueryRunner
 from .query_runner.neo4j_query_runner import Neo4jQueryRunner
 from .query_runner.query_runner import QueryRunner
@@ -133,6 +134,24 @@ class GraphDataScience(DirectEndpoints, UncallableNamespace):
         return FastPathRunner(
             self._query_runner,
             "gds.fastpath",
+            self._server_version,
+            self._compute_cluster_ip,
+            self._encrypted_db_password,
+            self._query_runner.uri,
+        )
+
+    @property
+    def kge(self) -> KgeRunner:
+        print("!!!kge")
+        # if not isinstance(self._query_runner, ArrowQueryRunner):
+        #     raise ValueError("Running FastPath requires GDS with the Arrow server enabled")
+        if self._compute_cluster_ip is None:
+            raise ValueError(
+                "You must set a valid computer cluster ip with the method `set_compute_cluster_ip` to use this feature"
+            )
+        return KgeRunner(
+            self._query_runner,
+            "gds.kge",
             self._server_version,
             self._compute_cluster_ip,
             self._encrypted_db_password,
